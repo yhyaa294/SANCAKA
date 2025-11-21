@@ -37,6 +37,11 @@
                             <span class="mode-name">UJI NYALI</span>
                             <span class="mode-desc">Mode Kuis Interaktif</span>
                         </button>
+                        <button id="history-btn" class="mode-btn history-btn" aria-label="Mode Riwayat">
+                            <span class="mode-icon">📜</span>
+                            <span class="mode-name">RIWAYAT</span>
+                            <span class="mode-desc">Catatan Perjuangan</span>
+                        </button>
                     </div>
                 </div>
             </main>
@@ -90,6 +95,37 @@
             </footer>
         </div>
 
+        <!-- Halaman Riwayat -->
+        <div id="history-page" class="page">
+            <header class="header">
+                <div class="header-content">
+                    <button id="back-to-landing-history" class="btn btn-secondary btn-back" aria-label="Kembali ke halaman utama">← Kembali</button>
+                    <div class="brand-logo">
+                        <img src="assets/logo.png" alt="SANCAKA Logo">
+                    </div>
+                    <div class="spacer"></div>
+                </div>
+            </header>
+
+            <main class="history-main">
+                <div class="history-container">
+                    <h2>Riwayat Perjuangan</h2>
+                    <p>Catatan hasil latihanmu</p>
+
+                    <div id="history-list" class="history-list">
+                        <!-- History items will be injected here -->
+                        <div class="empty-state">Belum ada riwayat kuis.</div>
+                    </div>
+
+                    <button id="clear-history-btn" class="btn btn-secondary btn-danger">Hapus Riwayat</button>
+                </div>
+            </main>
+
+            <footer class="footer">
+                <p>&copy; SANCAKA</p>
+            </footer>
+        </div>
+
         <!-- Halaman Materi (Flashcards) -->
         <div id="learn-page" class="page">
             <header class="header">
@@ -127,6 +163,9 @@
                                 <div class="flashcard-info">
                                     <h3 id="flashcard-name">Nama Aksara</h3>
                                     <p id="flashcard-description">Deskripsi aksara</p>
+                                    <div class="flashcard-detail-container">
+                                        <p id="flashcard-detail" class="flashcard-detail">Detail info...</p>
+                                    </div>
                                 </div>
                                 <div class="flashcard-controls">
                                     <button id="prev-flashcard-back" class="btn btn-secondary" aria-label="Kartu sebelumnya">← Sebelumnya</button>
@@ -227,6 +266,26 @@
                     </div>
                 </div>
             </main>
+
+            <!-- Feedback Modal -->
+            <div id="feedback-modal" class="modal hidden">
+                <div class="modal-content">
+                    <div id="modal-feedback-message" class="feedback-message" role="status"></div>
+                    <div class="modal-body">
+                        <p id="modal-feedback-explanation" class="feedback-explanation"></p>
+                    </div>
+                    <div class="timer-container">
+                        <div class="timer-circle">
+                            <span id="timer-countdown">5</span>
+                        </div>
+                        <p>Lanjut otomatis dalam <span id="timer-text">5</span> detik</p>
+                    </div>
+                    <div class="modal-controls">
+                        <button id="pause-timer-btn" class="btn btn-secondary">Tunggu</button>
+                        <button id="modal-next-btn" class="btn btn-primary">Lanjut</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Halaman Hasil -->

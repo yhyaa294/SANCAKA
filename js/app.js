@@ -9,12 +9,14 @@ function initApp() {
     learn: document.getElementById('learn-page'),
     categoryQuiz: document.getElementById('category-quiz-page'),
     quiz: document.getElementById('quiz-page'),
-    result: document.getElementById('result-page')
+    result: document.getElementById('result-page'),
+    history: document.getElementById('history-page')
   };
 
   // Landing Page Elements
   const learnBtn = document.getElementById('learn-btn');
   const quizBtn = document.getElementById('quiz-btn');
+  const historyBtn = document.getElementById('history-btn');
   console.log('learnBtn:', learnBtn);
   console.log('quizBtn:', quizBtn);
 
@@ -25,10 +27,15 @@ function initApp() {
   // Back Buttons
   const backToLandingLearn = document.getElementById('back-to-landing-learn');
   const backToLandingQuiz = document.getElementById('back-to-landing-quiz');
+  const backToLandingHistory = document.getElementById('back-to-landing-history');
   const backToCategoryLearn = document.getElementById('back-to-category-learn');
   const backToCategoryQuiz = document.getElementById('back-to-category-quiz');
   const backToCategoryResult = document.getElementById('back-to-category-result');
   const backToCategories = document.getElementById('back-to-categories');
+
+  // History Elements
+  const historyList = document.getElementById('history-list');
+  const clearHistoryBtn = document.getElementById('clear-history-btn');
 
   // Learn Page Elements
   const learnCategoryTitle = document.getElementById('learn-category-title');
@@ -37,6 +44,7 @@ function initApp() {
   const flashcardImage = document.getElementById('flashcard-image');
   const flashcardName = document.getElementById('flashcard-name');
   const flashcardDescription = document.getElementById('flashcard-description');
+  const flashcardDetail = document.getElementById('flashcard-detail');
   const flipFlashcard = document.getElementById('flip-flashcard');
   const flipFlashcardBack = document.getElementById('flip-flashcard-back');
   const prevFlashcard = document.getElementById('prev-flashcard');
@@ -53,6 +61,15 @@ function initApp() {
   const feedbackMessage = document.getElementById('feedback-message');
   const feedbackExplanation = document.getElementById('feedback-explanation');
   const nextBtn = document.getElementById('next-btn');
+
+  // Modal Elements
+  const feedbackModal = document.getElementById('feedback-modal');
+  const modalFeedbackMessage = document.getElementById('modal-feedback-message');
+  const modalFeedbackExplanation = document.getElementById('modal-feedback-explanation');
+  const timerCountdown = document.getElementById('timer-countdown');
+  const timerText = document.getElementById('timer-text');
+  const pauseTimerBtn = document.getElementById('pause-timer-btn');
+  const modalNextBtn = document.getElementById('modal-next-btn');
 
   // Progress Elements
   const questionCounter = document.getElementById('question-counter');
@@ -71,6 +88,8 @@ function initApp() {
   let currentIndex = 0;
   let score = 0;
   let quizQuestions = [];
+  let timerInterval = null;
+  let isPaused = false;
   const totalQuestions = window.QUIZ_CONFIG?.totalQuestions || 5;
 
   // Helpers
@@ -211,6 +230,9 @@ function initApp() {
     // Update back side
     flashcardName.textContent = item.latin;
     flashcardDescription.textContent = item.description;
+    if (flashcardDetail) {
+        flashcardDetail.textContent = item.detail || '';
+    }
     
     // Reset flip state
     flashcard.classList.remove('flipped');
@@ -317,12 +339,6 @@ function initApp() {
       selectedButton.classList.add('selected');
     }
     
-    // Show feedback
-    feedbackSection.classList.remove('hidden');
-    feedbackMessage.textContent = isCorrect ? 'Benar! 🎉' : 'Salah! 😢';
-    feedbackMessage.className = `feedback-message ${isCorrect ? 'correct' : 'wrong'}`;
-    feedbackExplanation.textContent = question.explanation;
-    
     // Update score
     if (isCorrect) {
       score++;
@@ -337,6 +353,56 @@ function initApp() {
         button.classList.add('wrong');
       }
     });
+
+    // Show Modal Feedback
+    showFeedbackModal(isCorrect, question.explanation);
+  }
+
+  function showFeedbackModal(isCorrect, explanation) {
+    modalFeedbackMessage.textContent = isCorrect ? 'Benar! 🎉' : 'Salah! 😢';
+    modalFeedbackMessage.className = `feedback-message ${isCorrect ? 'correct' : 'wrong'}`;
+    modalFeedbackExplanation.textContent = explanation;
+    feedbackModal.classList.remove('hidden');
+
+    startTimer();
+  }
+
+  function startTimer() {
+    let timeLeft = 5;
+    isPaused = false;
+    pauseTimerBtn.textContent = 'Tunggu';
+
+    updateTimerDisplay(timeLeft);
+
+    if (timerInterval) clearInterval(timerInterval);
+
+    timerInterval = setInterval(() => {
+      if (!isPaused) {
+        timeLeft--;
+        updateTimerDisplay(timeLeft);
+
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          closeModalAndNext();
+        }
+      }
+    }, 1000);
+  }
+
+  function updateTimerDisplay(timeLeft) {
+    timerCountdown.textContent = timeLeft;
+    timerText.textContent = timeLeft;
+  }
+
+  function pauseTimer() {
+    isPaused = !isPaused;
+    pauseTimerBtn.textContent = isPaused ? 'Lanjutkan' : 'Tunggu';
+  }
+
+  function closeModalAndNext() {
+    if (timerInterval) clearInterval(timerInterval);
+    feedbackModal.classList.add('hidden');
+    nextQuestion();
   }
 
   function nextQuestion() {
@@ -373,12 +439,82 @@ function initApp() {
       resultCategory.textContent = `Kategori: ${category.name}`;
     }
     
+    // Save to History
+    saveHistory(score, totalQuestions, category ? category.name : 'Unknown');
+
     showPage('result');
+  }
+
+  // History Functions
+  function showHistory() {
+    renderHistory();
+    showPage('history');
+  }
+
+  function saveHistory(score, total, categoryName) {
+    const historyItem = {
+      date: new Date().toISOString(),
+      score: score,
+      total: total,
+      category: categoryName
+    };
+
+    let history = JSON.parse(localStorage.getItem('sancaka_history') || '[]');
+    history.unshift(historyItem); // Add to beginning
+    // Limit history to 20 items
+    if (history.length > 20) history = history.slice(0, 20);
+
+    localStorage.setItem('sancaka_history', JSON.stringify(history));
+  }
+
+  function renderHistory() {
+    const history = JSON.parse(localStorage.getItem('sancaka_history') || '[]');
+    historyList.innerHTML = '';
+
+    if (history.length === 0) {
+      historyList.innerHTML = '<div class="empty-state">Belum ada riwayat kuis.</div>';
+      return;
+    }
+
+    history.forEach(item => {
+      const date = new Date(item.date);
+      const formattedDate = date.toLocaleDateString('id-ID', {
+        day: 'numeric', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+
+      const percentage = Math.round((item.score / item.total) * 100);
+      let gradeClass = 'grade-low';
+      if (percentage >= 80) gradeClass = 'grade-high';
+      else if (percentage >= 60) gradeClass = 'grade-medium';
+
+      const historyEl = document.createElement('div');
+      historyEl.className = 'history-item';
+      historyEl.innerHTML = `
+        <div class="history-info">
+          <div class="history-category">${item.category}</div>
+          <div class="history-date">${formattedDate}</div>
+        </div>
+        <div class="history-score ${gradeClass}">
+          <span class="score-val">${item.score}/${item.total}</span>
+          <span class="score-pct">${percentage}%</span>
+        </div>
+      `;
+      historyList.appendChild(historyEl);
+    });
+  }
+
+  function clearHistory() {
+    if (confirm('Apakah Anda yakin ingin menghapus semua riwayat?')) {
+      localStorage.removeItem('sancaka_history');
+      renderHistory();
+    }
   }
 
   // Event Listeners
   if (learnBtn) learnBtn.addEventListener('click', showCategoryForLearn);
   if (quizBtn) quizBtn.addEventListener('click', showCategoryForQuiz);
+  if (historyBtn) historyBtn.addEventListener('click', showHistory);
 
   // Category selection for Learn
   categoryLearnButtons.forEach(button => {
@@ -399,6 +535,7 @@ function initApp() {
   // Back buttons
   if (backToLandingLearn) backToLandingLearn.addEventListener('click', () => showPage('landing'));
   if (backToLandingQuiz) backToLandingQuiz.addEventListener('click', () => showPage('landing'));
+  if (backToLandingHistory) backToLandingHistory.addEventListener('click', () => showPage('landing'));
   if (backToCategoryLearn) backToCategoryLearn.addEventListener('click', showCategoryForLearn);
   if (backToCategoryQuiz) backToCategoryQuiz.addEventListener('click', showCategoryForQuiz);
   if (backToCategoryResult) backToCategoryResult.addEventListener('click', showCategoryForQuiz);
@@ -410,6 +547,9 @@ function initApp() {
     }
   });
 
+  // History controls
+  if (clearHistoryBtn) clearHistoryBtn.addEventListener('click', clearHistory);
+
   // Flashcard controls
   if (flipFlashcard) flipFlashcard.addEventListener('click', flipCard);
   if (flipFlashcardBack) flipFlashcardBack.addEventListener('click', flipCard);
@@ -420,6 +560,10 @@ function initApp() {
 
   // Quiz controls
   if (nextBtn) nextBtn.addEventListener('click', nextQuestion);
+
+  // Modal Controls
+  if (pauseTimerBtn) pauseTimerBtn.addEventListener('click', pauseTimer);
+  if (modalNextBtn) modalNextBtn.addEventListener('click', closeModalAndNext);
 
   // Keyboard navigation for flashcards
   document.addEventListener('keydown', (e) => {
