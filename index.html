@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SANCAKA </title>
-    <link rel="stylesheet" href="css/style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SANCAKA - Cyber-Kejawen</title>
+    <link rel="stylesheet" href="css/style.css">
+    <meta name="description" content="Aplikasi belajar Aksara Jawa dengan pendekatan modern Cyber-Kejawen">
+    <meta name="theme-color" content="#051f18">
 </head>
 <body>
     <div id="app" class="app-container">
@@ -22,15 +24,15 @@
                         <span class="icon" aria-hidden="true">ꦱ</span>
                     </div>
                     <h2>Selamat Datang di SANCAKA</h2>
-                    <p>Belajar aksara jawa  dengan lebih mudah bersama kami </p>
+                    <p>Belajar aksara jawa dengan lebih mudah bersama kami</p>
                     
                     <div class="mode-grid">
-                        <button id="learn-btn" class="mode-btn learn-btn">
+                        <button id="learn-btn" class="mode-btn learn-btn" aria-label="Mode Belajar">
                             <span class="mode-icon">📚</span>
                             <span class="mode-name">SINAU</span>
                             <span class="mode-desc">Mode Belajar & Materi</span>
                         </button>
-                        <button id="quiz-btn" class="mode-btn quiz-btn">
+                        <button id="quiz-btn" class="mode-btn quiz-btn" aria-label="Mode Kuis">
                             <span class="mode-icon">⚔️</span>
                             <span class="mode-name">UJI NYALI</span>
                             <span class="mode-desc">Mode Kuis Interaktif</span>
@@ -40,8 +42,8 @@
             </main>
 
             <footer class="footer">
-                <p>&copy;  SANCAKA by team SMANERO GenZAI </p>
-                <p>&copy;  Support by Pasalku.ai & SmartAPD </p>
+                <p>&copy; SANCAKA by team SMANERO GenZAI</p>
+                <p>Support by Pasalku.ai & SmartAPD</p>
             </footer>
         </div>
 
@@ -49,7 +51,7 @@
         <div id="category-learn-page" class="page">
             <header class="header">
                 <div class="header-content">
-                    <button id="back-to-landing-learn" class="btn btn-secondary btn-back">← Kembali</button>
+                    <button id="back-to-landing-learn" class="btn btn-secondary btn-back" aria-label="Kembali ke halaman utama">← Kembali</button>
                     <div class="brand-logo">
                         <img src="assets/logo.png" alt="SANCAKA Logo">
                     </div>
@@ -63,19 +65,19 @@
                     <p>Pelajari aksara Jawa melalui flashcards</p>
                     
                     <div class="category-grid">
-                        <button class="category-btn" data-category="dasar">
+                        <button class="category-btn" data-category="dasar" aria-label="Kategori Hanacaraka Dasar">
                             <span class="category-icon">ꦲ</span>
                             <span class="category-name">Hanacaraka Dasar</span>
                         </button>
-                        <button class="category-btn" data-category="murda">
+                        <button class="category-btn" data-category="murda" aria-label="Kategori Aksara Murda">
                             <span class="category-icon">ꦟ</span>
                             <span class="category-name">Aksara Murda</span>
                         </button>
-                        <button class="category-btn" data-category="pasangan">
+                        <button class="category-btn" data-category="pasangan" aria-label="Kategori Pasangan Aksara">
                             <span class="category-icon">ꦥ</span>
                             <span class="category-name">Pasangan Aksara</span>
                         </button>
-                        <button class="category-btn" data-category="sandangan">
+                        <button class="category-btn" data-category="sandangan" aria-label="Kategori Sandangan">
                             <span class="category-icon">◌ꦼ</span>
                             <span class="category-name">Sandangan</span>
                         </button>
@@ -84,7 +86,7 @@
             </main>
 
             <footer class="footer">
-                <p>&copy; SANCAKA </p>
+                <p>&copy; SANCAKA</p>
             </footer>
         </div>
 
@@ -92,7 +94,7 @@
         <div id="learn-page" class="page">
             <header class="header">
                 <div class="header-content">
-                    <button id="back-to-category-learn" class="btn btn-secondary btn-back">← Kembali</button>
+                    <button id="back-to-category-learn" class="btn btn-secondary btn-back" aria-label="Kembali ke kategori">← Kembali</button>
                     <div class="brand-logo">
                         <img src="assets/logo.png" alt="SANCAKA Logo">
                     </div>
@@ -113,12 +115,12 @@
                         <div class="flashcard">
                             <div class="flashcard-front">
                                 <div class="flashcard-image-container">
-                                    <img id="flashcard-image" src="" alt="Aksara Jawa">
+                                    <img id="flashcard-image" src="" alt="Aksara Jawa" loading="lazy">
                                 </div>
                                 <div class="flashcard-controls">
-                                    <button id="prev-flashcard" class="btn btn-secondary">← Sebelumnya</button>
-                                    <button id="flip-flashcard" class="btn btn-primary">Balik Kartu</button>
-                                    <button id="next-flashcard" class="btn btn-secondary">Berikutnya →</button>
+                                    <button id="prev-flashcard" class="btn btn-secondary" aria-label="Kartu sebelumnya">← Sebelumnya</button>
+                                    <button id="flip-flashcard" class="btn btn-primary" aria-label="Balik kartu">Balik Kartu</button>
+                                    <button id="next-flashcard" class="btn btn-secondary" aria-label="Kartu berikutnya">Berikutnya →</button>
                                 </div>
                             </div>
                             <div class="flashcard-back">
@@ -127,9 +129,9 @@
                                     <p id="flashcard-description">Deskripsi aksara</p>
                                 </div>
                                 <div class="flashcard-controls">
-                                    <button id="prev-flashcard-back" class="btn btn-secondary">← Sebelumnya</button>
-                                    <button id="flip-flashcard-back" class="btn btn-primary">Balik Kartu</button>
-                                    <button id="next-flashcard-back" class="btn btn-secondary">Berikutnya →</button>
+                                    <button id="prev-flashcard-back" class="btn btn-secondary" aria-label="Kartu sebelumnya">← Sebelumnya</button>
+                                    <button id="flip-flashcard-back" class="btn btn-primary" aria-label="Balik kartu">Balik Kartu</button>
+                                    <button id="next-flashcard-back" class="btn btn-secondary" aria-label="Kartu berikutnya">Berikutnya →</button>
                                 </div>
                             </div>
                         </div>
@@ -138,7 +140,7 @@
             </main>
 
             <footer class="footer">
-                <p>&copy; SANCAKA </p>
+                <p>&copy; SANCAKA</p>
             </footer>
         </div>
 
@@ -146,7 +148,7 @@
         <div id="category-quiz-page" class="page">
             <header class="header">
                 <div class="header-content">
-                    <button id="back-to-landing-quiz" class="btn btn-secondary btn-back">← Kembali</button>
+                    <button id="back-to-landing-quiz" class="btn btn-secondary btn-back" aria-label="Kembali ke halaman utama">← Kembali</button>
                     <div class="brand-logo">
                         <img src="assets/logo.png" alt="SANCAKA Logo">
                     </div>
@@ -160,19 +162,19 @@
                     <p>Uji pengetahuan Anda tentang aksara Jawa</p>
                     
                     <div class="category-grid">
-                        <button class="category-btn" data-category="dasar">
+                        <button class="category-btn" data-category="dasar" aria-label="Kategori Hanacaraka Dasar">
                             <span class="category-icon">ꦲ</span>
                             <span class="category-name">Hanacaraka Dasar</span>
                         </button>
-                        <button class="category-btn" data-category="murda">
+                        <button class="category-btn" data-category="murda" aria-label="Kategori Aksara Murda">
                             <span class="category-icon">ꦟ</span>
                             <span class="category-name">Aksara Murda</span>
                         </button>
-                        <button class="category-btn" data-category="pasangan">
+                        <button class="category-btn" data-category="pasangan" aria-label="Kategori Pasangan Aksara">
                             <span class="category-icon">ꦥ</span>
                             <span class="category-name">Pasangan Aksara</span>
                         </button>
-                        <button class="category-btn" data-category="sandangan">
+                        <button class="category-btn" data-category="sandangan" aria-label="Kategori Sandangan">
                             <span class="category-icon">◌ꦼ</span>
                             <span class="category-name">Sandangan</span>
                         </button>
@@ -181,7 +183,7 @@
             </main>
 
             <footer class="footer">
-                <p>&copy; SANCAKA </p>
+                <p>&copy; SANCAKA</p>
             </footer>
         </div>
 
@@ -189,7 +191,7 @@
         <div id="quiz-page" class="page" aria-live="polite">
             <header class="header">
                 <div class="header-content">
-                    <button id="back-to-category-quiz" class="btn btn-secondary btn-back">← Kembali</button>
+                    <button id="back-to-category-quiz" class="btn btn-secondary btn-back" aria-label="Kembali ke kategori">← Kembali</button>
                     <div class="brand-logo">
                         <img src="assets/logo.png" alt="SANCAKA Logo">
                     </div>
@@ -231,7 +233,7 @@
         <div id="result-page" class="page">
             <header class="header">
                 <div class="header-content">
-                    <button id="back-to-category-result" class="btn btn-secondary btn-back">← Kembali</button>
+                    <button id="back-to-category-result" class="btn btn-secondary btn-back" aria-label="Kembali ke kategori">← Kembali</button>
                     <div class="brand-logo">
                         <img src="assets/logo.png" alt="SANCAKA Logo">
                     </div>
@@ -262,7 +264,7 @@
             </main>
 
             <footer class="footer">
-                <p>&copy;  SANCAKA </p>
+                <p>&copy; SANCAKA</p>
             </footer>
         </div>
     </div>

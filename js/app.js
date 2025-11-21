@@ -200,32 +200,34 @@ function initApp() {
     if (!currentCategoryData || currentIndex < 0 || currentIndex >= currentCategoryData.length) return;
     
     const item = currentCategoryData[currentIndex];
+    
+    // Update counter
     flashcardCurrent.textContent = currentIndex + 1;
+    
+    // Update image
     flashcardImage.src = item.image;
-    flashcardImage.alt = item.latin;
+    flashcardImage.alt = `Aksara ${item.latin}`;
+    
+    // Update back side
     flashcardName.textContent = item.latin;
     flashcardDescription.textContent = item.description;
     
     // Reset flip state
-    if (flashcard) {
-      flashcard.classList.remove('flipped');
-    }
+    flashcard.classList.remove('flipped');
   }
 
-  function flipFlashcardCard() {
-    if (flashcard) {
-      flashcard.classList.toggle('flipped');
-    }
+  function flipCard() {
+    flashcard.classList.toggle('flipped');
   }
 
-  function nextFlashcardCard() {
+  function nextFlashcardFunc() {
     if (currentIndex < currentCategoryData.length - 1) {
       currentIndex++;
       updateFlashcard();
     }
   }
 
-  function prevFlashcardCard() {
+  function prevFlashcardFunc() {
     if (currentIndex > 0) {
       currentIndex--;
       updateFlashcard();
@@ -240,241 +242,228 @@ function initApp() {
 
   function startQuiz(categoryKey) {
     currentCategory = categoryKey;
+    quizQuestions = generateQuizQuestions(categoryKey);
     currentIndex = 0;
     score = 0;
-    quizQuestions = generateQuizQuestions(categoryKey);
     
     if (quizQuestions.length === 0) {
-      alert('Kategori tidak ditemukan!');
+      alert('Tidak ada soal yang tersedia untuk kategori ini!');
       return;
     }
     
-    showPage('quiz');
-    renderQuestion();
-  }
-
-  function renderQuestion() {
-    const q = quizQuestions[currentIndex];
-    if (questionText) {
-      questionText.textContent = q.question;
-    }
-
-    // Render hanya gambar saja (tanpa teks nama aksara)
-    if (questionImageContainer) {
-      questionImageContainer.innerHTML = `<img src="${q.image}" alt="Aksara Jawa" class="question-image">`;
-    }
-
-    renderOptions(q);
-    if (feedbackSection) {
-      feedbackSection.classList.add('hidden');
-    }
-    if (nextBtn) {
-      nextBtn.disabled = true;
-    }
-
+    showQuestion();
     updateProgress();
+    showPage('quiz');
   }
 
-  function renderOptions(q) {
-    if (!optionsContainer) return;
+  function showQuestion() {
+    if (currentIndex >= quizQuestions.length) {
+      showResults();
+      return;
+    }
     
+    const question = quizQuestions[currentIndex];
+    
+    // Update question text
+    questionText.textContent = question.question;
+    
+    // Clear previous image
+    questionImageContainer.innerHTML = '';
+    
+    // Create and add new image
+    const img = document.createElement('img');
+    img.src = question.image;
+    img.alt = 'Aksara yang harus dikenali';
+    img.className = 'question-image';
+    img.loading = 'lazy'; // Improve loading performance
+    questionImageContainer.appendChild(img);
+    
+    // Clear previous options
     optionsContainer.innerHTML = '';
-    q.options.forEach((opt, idx) => {
-      const btn = document.createElement('button');
-      btn.className = 'option-btn';
-      btn.type = 'button';
-      btn.textContent = opt;
-      btn.setAttribute('data-index', idx);
-      btn.addEventListener('click', () => handleAnswer(q, btn, idx));
-      optionsContainer.appendChild(btn);
+    
+    // Create new options
+    question.options.forEach((option, index) => {
+      const button = document.createElement('button');
+      button.className = 'option-btn';
+      button.textContent = option;
+      button.setAttribute('data-index', index);
+      button.addEventListener('click', () => selectOption(index));
+      optionsContainer.appendChild(button);
+    });
+    
+    // Hide feedback section
+    feedbackSection.classList.add('hidden');
+    
+    // Enable all options
+    document.querySelectorAll('.option-btn').forEach(btn => {
+      btn.classList.remove('disabled', 'selected', 'correct', 'wrong');
     });
   }
 
-  function handleAnswer(q, selectedBtn, selectedIdx) {
-    if (!optionsContainer) return;
+  function selectOption(selectedIndex) {
+    if (currentIndex >= quizQuestions.length) return;
     
-    Array.from(optionsContainer.children).forEach(btn => {
+    const question = quizQuestions[currentIndex];
+    const isCorrect = selectedIndex === question.correctAnswerIndex;
+    
+    // Disable all options
+    document.querySelectorAll('.option-btn').forEach(btn => {
       btn.classList.add('disabled');
-      btn.disabled = true;
     });
-
-    const isCorrect = selectedIdx === q.correctAnswerIndex;
-    if (isCorrect) {
-      selectedBtn.classList.add('correct');
-      if (feedbackMessage) {
-        feedbackMessage.className = 'feedback-message correct';
-        feedbackMessage.textContent = 'Benar!';
-      }
-      score += 1;
-    } else {
-      selectedBtn.classList.add('wrong');
-      if (feedbackMessage) {
-        feedbackMessage.className = 'feedback-message wrong';
-        feedbackMessage.textContent = 'Kurang tepat.';
-      }
-      const correctBtn = optionsContainer.querySelector(`[data-index="${q.correctAnswerIndex}"]`);
-      if (correctBtn) correctBtn.classList.add('correct');
-    }
-
-    if (feedbackExplanation) {
-      feedbackExplanation.textContent = q.explanation;
-    }
-    if (feedbackSection) {
-      feedbackSection.classList.remove('hidden');
-    }
-    if (nextBtn) {
-      nextBtn.disabled = false;
-    }
-  }
-
-  function gotoNext() {
-    if (currentIndex < totalQuestions - 1) {
-      currentIndex += 1;
-      renderQuestion();
-    } else {
-      showResult();
-    }
-  }
-
-  function showResult() {
-    showPage('result');
-    if (finalScore) {
-      finalScore.textContent = String(score);
-    }
-    const percent = Math.round((score / totalQuestions) * 100);
-    if (scorePercentageText) {
-      scorePercentageText.textContent = `${percent}%`;
+    
+    // Highlight selected option
+    const selectedButton = document.querySelector(`.option-btn[data-index="${selectedIndex}"]`);
+    if (selectedButton) {
+      selectedButton.classList.add('selected');
     }
     
-    // Show category name
-    const category = window.QUIZ_CATEGORIES[currentCategory];
-    if (resultCategory) {
-      resultCategory.textContent = `Kategori: ${category ? category.name : 'Tidak diketahui'}`;
+    // Show feedback
+    feedbackSection.classList.remove('hidden');
+    feedbackMessage.textContent = isCorrect ? 'Benar! 🎉' : 'Salah! 😢';
+    feedbackMessage.className = `feedback-message ${isCorrect ? 'correct' : 'wrong'}`;
+    feedbackExplanation.textContent = question.explanation;
+    
+    // Update score
+    if (isCorrect) {
+      score++;
     }
-
-    let msg = 'Bagus! Terus belajar.';
-    if (percent === 100) msg = 'Sempurna! Hebat sekali.';
-    else if (percent >= 80) msg = 'Mantap! Pemahamanmu sangat baik.';
-    else if (percent >= 60) msg = 'Lumayan, terus tingkatkan.';
-    else msg = 'Tidak apa-apa, coba lagi ya!';
-    if (scoreMessage) {
-      scoreMessage.textContent = msg;
-    }
-
-    if (progressFill) {
-      progressFill.style.width = '100%';
-    }
-    if (questionCounter) {
-      questionCounter.textContent = `${totalQuestions} / ${totalQuestions}`;
-    }
+    
+    // Highlight correct/wrong answers
+    const optionButtons = document.querySelectorAll('.option-btn');
+    optionButtons.forEach((button, index) => {
+      if (index === question.correctAnswerIndex) {
+        button.classList.add('correct');
+      } else if (index === selectedIndex && !isCorrect) {
+        button.classList.add('wrong');
+      }
+    });
   }
 
-  function backToLanding() {
-    showPage('landing');
-    resetState();
-  }
-
-  function backToCategoryFromLearn() {
-    showPage('categoryLearn');
-  }
-
-  function backToCategoryFromQuiz() {
-    showPage('categoryQuiz');
-  }
-
-  function backToCategoryFromResult() {
-    if (currentMode === 'quiz') {
-      showPage('categoryQuiz');
+  function nextQuestion() {
+    currentIndex++;
+    if (currentIndex < quizQuestions.length) {
+      showQuestion();
+      updateProgress();
     } else {
-      showPage('categoryLearn');
+      showResults();
     }
   }
 
-  function resetState() {
-    currentMode = null;
-    currentCategory = null;
-    currentCategoryData = null;
-    currentIndex = 0;
-    score = 0;
-    quizQuestions = [];
+  function showResults() {
+    const percentage = Math.round((score / totalQuestions) * 100);
+    
+    // Update result UI
+    finalScore.textContent = score;
+    scorePercentageText.textContent = `${percentage}%`;
+    
+    // Set appropriate message
+    let message = '';
+    if (percentage >= 80) {
+      message = 'Luar biasa! Kamu benar-benar menguasai materi ini.';
+    } else if (percentage >= 60) {
+      message = 'Bagus! Terus belajar untuk meningkatkan pemahamanmu.';
+    } else {
+      message = 'Jangan menyerah! Pelajari lagi materinya dan coba lagi.';
+    }
+    scoreMessage.textContent = message;
+    
+    // Set category name
+    const category = window.QUIZ_CATEGORIES[currentCategory];
+    if (category) {
+      resultCategory.textContent = `Kategori: ${category.name}`;
+    }
+    
+    showPage('result');
   }
 
-  // Event listeners for mode selection
-  if (learnBtn) {
-    learnBtn.addEventListener('click', showCategoryForLearn);
-  }
-  if (quizBtn) {
-    quizBtn.addEventListener('click', showCategoryForQuiz);
-  }
+  // Event Listeners
+  if (learnBtn) learnBtn.addEventListener('click', showCategoryForLearn);
+  if (quizBtn) quizBtn.addEventListener('click', showCategoryForQuiz);
 
-  // Event listeners for category selection (Learn)
-  if (categoryLearnButtons) {
-    categoryLearnButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        const category = button.getAttribute('data-category');
-        showLearnPage(category);
-      });
+  // Category selection for Learn
+  categoryLearnButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const category = button.getAttribute('data-category');
+      if (category) showLearnPage(category);
     });
-  }
+  });
 
-  // Event listeners for category selection (Quiz)
-  if (categoryQuizButtons) {
-    categoryQuizButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        const category = button.getAttribute('data-category');
-        startQuiz(category);
-      });
+  // Category selection for Quiz
+  categoryQuizButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const category = button.getAttribute('data-category');
+      if (category) startQuiz(category);
     });
-  }
+  });
 
-  // Back button event listeners
-  if (backToLandingLearn) {
-    backToLandingLearn.addEventListener('click', backToLanding);
-  }
-  if (backToLandingQuiz) {
-    backToLandingQuiz.addEventListener('click', backToLanding);
-  }
-  if (backToCategoryLearn) {
-    backToCategoryLearn.addEventListener('click', backToCategoryFromLearn);
-  }
-  if (backToCategoryQuiz) {
-    backToCategoryQuiz.addEventListener('click', backToCategoryFromQuiz);
-  }
-  if (backToCategoryResult) {
-    backToCategoryResult.addEventListener('click', backToCategoryFromResult);
-  }
-  if (backToCategories) {
-    backToCategories.addEventListener('click', backToCategoryFromResult);
-  }
+  // Back buttons
+  if (backToLandingLearn) backToLandingLearn.addEventListener('click', () => showPage('landing'));
+  if (backToLandingQuiz) backToLandingQuiz.addEventListener('click', () => showPage('landing'));
+  if (backToCategoryLearn) backToCategoryLearn.addEventListener('click', showCategoryForLearn);
+  if (backToCategoryQuiz) backToCategoryQuiz.addEventListener('click', showCategoryForQuiz);
+  if (backToCategoryResult) backToCategoryResult.addEventListener('click', showCategoryForQuiz);
+  if (backToCategories) backToCategories.addEventListener('click', () => {
+    if (currentMode === 'learn') {
+      showCategoryForLearn();
+    } else {
+      showCategoryForQuiz();
+    }
+  });
 
-  // Flashcard event listeners
-  if (flipFlashcard) {
-    flipFlashcard.addEventListener('click', flipFlashcardCard);
-  }
-  if (flipFlashcardBack) {
-    flipFlashcardBack.addEventListener('click', flipFlashcardCard);
-  }
-  if (prevFlashcard) {
-    prevFlashcard.addEventListener('click', prevFlashcardCard);
-  }
-  if (nextFlashcard) {
-    nextFlashcard.addEventListener('click', nextFlashcardCard);
-  }
-  if (prevFlashcardBack) {
-    prevFlashcardBack.addEventListener('click', prevFlashcardCard);
-  }
-  if (nextFlashcardBack) {
-    nextFlashcardBack.addEventListener('click', nextFlashcardCard);
-  }
+  // Flashcard controls
+  if (flipFlashcard) flipFlashcard.addEventListener('click', flipCard);
+  if (flipFlashcardBack) flipFlashcardBack.addEventListener('click', flipCard);
+  if (prevFlashcard) prevFlashcard.addEventListener('click', prevFlashcardFunc);
+  if (nextFlashcard) nextFlashcard.addEventListener('click', nextFlashcardFunc);
+  if (prevFlashcardBack) prevFlashcardBack.addEventListener('click', prevFlashcardFunc);
+  if (nextFlashcardBack) nextFlashcardBack.addEventListener('click', nextFlashcardFunc);
 
-  // Quiz event listeners
-  if (nextBtn) {
-    nextBtn.addEventListener('click', gotoNext);
-  }
+  // Quiz controls
+  if (nextBtn) nextBtn.addEventListener('click', nextQuestion);
 
-  // Init
+  // Keyboard navigation for flashcards
+  document.addEventListener('keydown', (e) => {
+    // Only handle key events when on learn page
+    if (!pages.learn.classList.contains('active')) return;
+    
+    switch(e.key) {
+      case 'ArrowLeft':
+        prevFlashcardFunc();
+        break;
+      case 'ArrowRight':
+        nextFlashcardFunc();
+        break;
+      case ' ':
+        e.preventDefault();
+        flipCard();
+        break;
+    }
+  });
+
+  // Prevent zoom on double tap for mobile
+  let lastTouchEnd = 0;
+  document.addEventListener('touchend', function (event) {
+    const now = (new Date()).getTime();
+    if (now - lastTouchEnd <= 300) {
+      event.preventDefault();
+    }
+    lastTouchEnd = now;
+  }, false);
+
+  // Initialize app
   showPage('landing');
 }
 
-// Langsung panggil function
-initApp();
+// Wait for DOM to load completely
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
+
+// Handle potential issues with window.QUIZ_CATEGORIES
+window.addEventListener('load', function() {
+  if (typeof window.QUIZ_CATEGORIES === 'undefined') {
+    console.error('QUIZ_CATEGORIES is not defined. Check if data.js is loaded correctly.');
+  }
+});
