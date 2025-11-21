@@ -13,7 +13,7 @@
 
 Aplikasi ini dibangun dengan pendekatan **Pure Native** (Tanpa Framework) untuk performa maksimal, aksesibilitas tinggi, dan ukuran yang sangat ringan.
 
-🔗 **Live Demo:** [https://yhyaa294.github.io/SANCAKA/](https://yhyaa294.github.io/SANCAKA/)
+🔗 **Live Demo:** [https://yhyaa294.github.io/SANCAKA/](https://yhyaa294.github.io/SANCAKA/)         https://sancaka.vercel.app/
 
 ---
 
